@@ -60,7 +60,7 @@ namespace nFire.Evaluators.Graded
             set;
         }
         /// <summary>
-        /// Gets and sets the cut-off k for cumulated-gain@k. If null, precision is computed, with not cut-off.
+        /// Gets and sets the cut-off k for cumulated-gain@k. If null, cumulated gain is computed, with not cut-off.
         /// </summary>
         public int? Cutoff
         {

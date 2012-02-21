@@ -82,7 +82,7 @@ namespace nFire.Evaluators.Graded
         /// </summary>
         /// <param name="minScore">The minimum gain a judgment must have to contribute to the score.</param>
         /// <param name="cutoff">The cut-off k for average-gain@k.</param>
-        public AverageGain(double minScore, int? cutoff = null)
+        public AverageGain(double minScore = 0, int? cutoff = null)
         {
             this.MinScore = minScore;
             this.Cutoff = cutoff;

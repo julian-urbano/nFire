@@ -26,7 +26,6 @@ namespace nFire.Evaluators.Graded
     /// <summary>
     /// An evaluator for normalized discounted cumulated gain and normalized discounted cumulated gain after k documents retrieved (normalized-discounted-cumulated-gain@k).
     /// For normalized-discounted-cumulated-gain@k it is assumed that the results in the run are ordered by rank.
-    /// <remarks>This implementation is based on the discount function in the original paper by Järvelin and Kekäläinen in ACM TOIS, where documents ranked above the log base are not discounted.</remarks>
     /// </summary>
     public class NormalizedDiscountedCumulatedGain :
         IEvaluator<double, IListResult>
@@ -63,18 +62,25 @@ namespace nFire.Evaluators.Graded
             set;
         }
         /// <summary>
-        /// Gets and sets the cut-off k for normalized-discounted-cumulated-gain@k. If null, average gain is computed, with not cut-off.
+        /// Gets and sets the cut-off k for normalized-discounted-cumulated-gain@k. If null, normalized discounted cumulated gain is computed, with not cut-off.
         /// </summary>
         public int? Cutoff
         {
             get;
             set;
         }
-
         /// <summary>
         /// Gets and sets the base of the logarithm for the discount function.
         /// </summary>
         public double LogBase
+        {
+            get;
+            set;
+        }
+        /// <summary>
+        /// The function to use when discounting a document's gain.
+        /// </summary>
+        public DcgDiscountFunction DiscountFunction
         {
             get;
             set;
@@ -92,15 +98,17 @@ namespace nFire.Evaluators.Graded
         /// <summary>
         /// Creates an evaluator for normalized discounted cumulated gain and normalized-discounted-cumulated-gain@k.
         /// </summary>
+        /// <param name="discountFunction">The discount function to lower gains.</param>
         /// <param name="minScore">The minimum gain a judgment must have to contribute to the score.</param>
         /// <param name="logBase">The base of the logarithm for the discount function.</param>
         /// <param name="cutoff">The cut-off k for normalized-discounted-cumulated-gain@k.</param>
-        public NormalizedDiscountedCumulatedGain(double minScore=1, double logBase = 2, int? cutoff = null)
+        public NormalizedDiscountedCumulatedGain(DcgDiscountFunction discountFunction, double minScore=1, double logBase = 2, int? cutoff = null)
         {
+            this.DiscountFunction = discountFunction;
             this.MinScore = minScore;
-            this.LogBase = 2;
+            this.LogBase = logBase;
             this.Cutoff = cutoff;
-            this.DCG = new DiscountedCumulatedGain();
+            this.DCG = new DiscountedCumulatedGain(discountFunction);
         }
 
         /// <summary>
@@ -112,6 +120,7 @@ namespace nFire.Evaluators.Graded
         /// <returns>The nDCG@k score.</returns>
         public double Evaluate(IRun<IListResult> groundTruth, IRun<IListResult> systemRun)
         {
+            this.DCG.DiscountFunction = this.DiscountFunction;
             this.DCG.LogBase = this.LogBase;
             this.DCG.Cutoff = this.Cutoff;
 

@@ -24,6 +24,21 @@ using nFire.Evaluators.Graded;
 namespace nFire.Evaluators.Graded
 {
     /// <summary>
+    /// Specifies a function to discount the document gains for the calculation of DCG scores.
+    /// </summary>
+    public enum DcgDiscountFunction
+    {
+        /// <summary>
+        /// The original function as in Järveling & Kekäläinen, ACM TOIS, 2002: 1 if i&lt;b or 1/log_b(i) if i&lte;b.
+        /// </summary>
+        Original,
+        /// <summary>
+        /// The function introduced by Microsoft: 1/log_b(i+1)
+        /// </summary>
+        Microsoft
+    }
+
+    /// <summary>
     /// An evaluator for discounted cumulated gain and discounted cumulated gain after k documents retrieved (discounted-cumulated-gain@k).
     /// For discounted-cumulated-gain@k it is assumed that the results in the run are ordered by rank.
     /// </summary>
@@ -53,7 +68,6 @@ namespace nFire.Evaluators.Graded
             }
         }
 
-
         /// <summary>
         /// Gets and sets the minimum gain a judgment must have to contribute to the score.
         /// </summary>
@@ -63,14 +77,13 @@ namespace nFire.Evaluators.Graded
             set;
         }
         /// <summary>
-        /// Gets and sets the cut-off k for discounted-cumulated-gain@k. If null, average gain is computed, with not cut-off.
+        /// Gets and sets the cut-off k for discounted-cumulated-gain@k. If null, discounted cumulated gain is computed, with not cut-off.
         /// </summary>
         public int? Cutoff
         {
             get;
             set;
         }
-
         /// <summary>
         /// Gets and sets the base of the logarithm for the discount function.
         /// </summary>
@@ -79,17 +92,27 @@ namespace nFire.Evaluators.Graded
             get;
             set;
         }
-        
+        /// <summary>
+        /// The function to use when discounting a document's gain.
+        /// </summary>
+        public DcgDiscountFunction DiscountFunction
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Creates an evaluator for discounted cumulated gain and discounted-cumulated-gain@k.
         /// </summary>
+        /// <param name="discountFunction">The discount function to lower gains.</param>
         /// <param name="minScore">The minimum gain a judgment must have to contribute to the score.</param>
         /// <param name="logBase">The base of the logarithm for the discount function.</param>
         /// <param name="cutoff">The cut-off k for discounted-cumulated-gain@k.</param>
-        public DiscountedCumulatedGain(double minScore=1, double logBase = 2, int? cutoff = null)
+        public DiscountedCumulatedGain(DcgDiscountFunction discountFunction, double minScore = 1, double logBase = 2, int? cutoff = null)
         {
+            this.DiscountFunction = discountFunction;
             this.MinScore = minScore;
-            this.LogBase = 2;
+            this.LogBase = logBase;
             this.Cutoff = cutoff;
         }
 
@@ -111,10 +134,18 @@ namespace nFire.Evaluators.Graded
             double dcg = 0;
             for (int i = 0; i < Math.Min(systemRun.Count, cut); i++) {
                 double g;
-                if (gains.TryGetValue(systemRun.ElementAt(i).Document.Id, out g) && g>=this.MinScore) {
-                    if (i + 1 < this.LogBase) dcg += g;
-                    else 
-                        dcg += g / Math.Log(i+1, this.LogBase);
+                if (gains.TryGetValue(systemRun.ElementAt(i).Document.Id, out g) && g >= this.MinScore) {
+                    switch (this.DiscountFunction) {
+                        case DcgDiscountFunction.Original:
+                            if (i + 1 < this.LogBase) dcg += g;
+                            else dcg += g / Math.Log(i + 1, this.LogBase);
+                            break;
+                        case DcgDiscountFunction.Microsoft:
+                            dcg += g / Math.Log(i + 2, this.LogBase);
+                            break;
+                        default:
+                            throw new ArgumentException("Invalid DCG Discount function: " + this.DiscountFunction.ToString());
+                    }
                 } else {
                     // Unjudged document
                 }

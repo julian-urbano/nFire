@@ -23,8 +23,8 @@ namespace nFire.Evaluators.Binary
     /// <summary>
     /// An evaluator for interpolated precision at recall levels.
     /// It is assumed that the results in the run are ordered by rank.
-    /// <remarks>Based on the implementation by Chris Buckley in trec_eval 9.1.</remarks>
     /// </summary>
+    /// <remarks>Based on the implementation by Chris Buckley in trec_eval 9.1.</remarks>
     public class InterpolatedPrecissionAtRecall :
         IEvaluator<double, IListResult>
     {

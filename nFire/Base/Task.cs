@@ -47,8 +47,8 @@ namespace nFire.Base
 
         /// <summary>
         /// The ground truth runs, indexed by query ID.
-        /// <remarks>query->run</remarks>
         /// </summary>
+        /// <remarks>query->run</remarks>
         protected SortedDictionary<string, IRun<T>> GroundTruthsByQuery
         {
             get;
@@ -56,8 +56,8 @@ namespace nFire.Base
         }
         /// <summary>
         /// The system runs, indexed by system and query.
-        /// <remarks>system->query->run</remarks>
         /// </summary>
+        /// <remarks>system->query->run</remarks>
         protected SortedDictionary<string, SortedDictionary<string, IRun<T>>> RunsBySystem
         {
             get;
@@ -65,8 +65,8 @@ namespace nFire.Base
         }
         /// <summary>
         /// The system runs, indexed by query and system.
-        /// <remarks>query->system->run</remarks>
         /// </summary>
+        /// <remarks>query->system->run</remarks>
         protected SortedDictionary<string, SortedDictionary<string, IRun<T>>> RunsByQuery
         {
             get;
