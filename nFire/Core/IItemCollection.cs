@@ -24,7 +24,7 @@ namespace nFire.Core
     /// A collection of identifiable items such as documents, queries or systems.
     /// </summary>
     /// <typeparam name="T">The type of items in the collection.</typeparam>
-   public interface IItemCollection<out T> : IEnumerable<T> where T : IComparable<T>
+    public interface IItemCollection<out T> : IEnumerable<T> where T : IComparable<T>
     {
         /// <summary>
         /// Gets the name of the collection.
@@ -36,6 +36,10 @@ namespace nFire.Core
         /// <param name="id">The ID of the item to get.</param>
         /// <returns>The item with the specified ID.</returns>
         T this[string id] { get; }
+        /// <summary>
+        /// Gets the number of elements in the collection.
+        /// </summary>
+        int Count { get; }
         /// <summary>
         /// Determines whether the collection contains an item with the specified ID.
         /// </summary>

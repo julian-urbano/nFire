@@ -10,6 +10,7 @@ namespace nFire.Base
     /// <summary>
     /// A base task.
     /// </summary>
+    [global::System.Diagnostics.DebuggerDisplay("Name = {Name}")]
     public class Task<T> : ITask<T> where T : IResult
     {
         /// <summary>

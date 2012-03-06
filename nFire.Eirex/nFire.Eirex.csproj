@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{1764945F-115B-473E-8391-18AB2EACE4EA}</ProjectGuid>
+    <ProjectGuid>{2CA867CF-7F1A-4C0C-9D99-20D39264ECB2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>nFire</RootNamespace>
-    <AssemblyName>nFire</AssemblyName>
+    <RootNamespace>nFire.Eirex</RootNamespace>
+    <AssemblyName>nFire.Eirex</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
@@ -30,7 +30,7 @@
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>true</UseApplicationTrust>
+    <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -38,13 +38,13 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\LAC\</OutputPath>
+    <OutputPath>..\..\lac\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\LAC\nFire.xml</DocumentationFile>
+    <DocumentationFile>..\..\lac\nFire.Eirex.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -53,15 +53,18 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DebugSymbols>true</DebugSymbols>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -72,34 +75,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Base\Document.cs" />
-    <Compile Include="Base\Query.cs" />
-    <Compile Include="Base\Result.cs" />
-    <Compile Include="Base\Run.cs" />
-    <Compile Include="Base\ItemCollection.cs" />
-    <Compile Include="Base\System.cs" />
-    <Compile Include="Base\Task.cs" />
-    <Compile Include="Core\IEvaluator.cs" />
-    <None Include="Evaluators\Graded\AverageDynamicRecall.cs" />
-    <Compile Include="Evaluators\Binary\AveragePrecision.cs" />
-    <Compile Include="Evaluators\Graded\AverageGain.cs" />
-    <Compile Include="Core\IItemCollection.cs" />
-    <Compile Include="Evaluators\Binary\FMeasure.cs" />
-    <Compile Include="Evaluators\Graded\NormalizedDiscountedCumulatedGain.cs" />
-    <Compile Include="Evaluators\Binary\Precision.cs" />
-    <Compile Include="Evaluators\Binary\InterpolatedPrecissionAtRecall.cs" />
-    <Compile Include="Evaluators\Binary\Recall.cs" />
-    <Compile Include="Evaluators\Binary\ReciprocalRank.cs" />
-    <Compile Include="Evaluators\Binary\RPrecision.cs" />
-    <Compile Include="Core\IResult.cs" />
-    <Compile Include="Core\IDocument.cs" />
-    <Compile Include="Core\ISystem.cs" />
-    <Compile Include="Core\ITask.cs" />
-    <Compile Include="Core\IQuery.cs" />
-    <Compile Include="Evaluators\Graded\CumulatedGain.cs" />
-    <Compile Include="Evaluators\Graded\DiscountedCumulatedGain.cs" />
+    <Compile Include="Document.cs" />
+    <Compile Include="Formatter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Core\IRun.cs" />
+    <Compile Include="Task.cs" />
+    <Compile Include="Topic.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\nFire\nFire.csproj">
+      <Project>{1764945F-115B-473E-8391-18AB2EACE4EA}</Project>
+      <Name>nFire</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

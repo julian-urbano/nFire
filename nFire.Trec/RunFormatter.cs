@@ -23,7 +23,7 @@ using nFire.Core;
 namespace nFire.Trec
 {
     /// <summary>
-    /// Reads system runs in TREC format.
+    /// Reads and writes system runs in TREC format.
     /// </summary>
     public class RunFormatter : IRunReader<IListResult>, IRunWriter<IListResult>
     {
@@ -95,7 +95,7 @@ namespace nFire.Trec
 
                     line = reader.ReadLine();
                 }
-                // In case no list was read
+                // In case no second list was read
                 if (currentRun != null) {
                     allRuns.Add(currentRun);
                 }

@@ -50,6 +50,16 @@ namespace nFire.Base
         {
             get;
         }
+        /// <summary>
+        /// Gets the number of elements in the collection.
+        /// </summary>
+        public int Count
+        {
+            get
+            {
+                return this.Items.Count;
+            }
+        }
 
         /// <summary>
         /// Determines whether the collection contains an item with the specified ID.

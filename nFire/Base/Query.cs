@@ -62,7 +62,7 @@ namespace nFire.Base
         /// <summary>
         /// Gets the query with the specified ID.
         /// </summary>
-        /// <param name="id">The ID of the queryto get.</param>
+        /// <param name="id">The ID of the query to get.</param>
         /// <returns>The query with the specified ID.</returns>
         public override Query this[string id]
         {

@@ -29,7 +29,7 @@ namespace nFire.Evaluators.Graded
     public enum DcgDiscountFunction
     {
         /// <summary>
-        /// The original function as in Järveling & Kekäläinen, ACM TOIS, 2002: 1 if i&lt;b or 1/log_b(i) if i&lte;b.
+        /// The original function as in Järveling &amp;Kekäläinen, ACM TOIS, 2002: 1 if i&lt;b or 1/log_b(i) if i&lt;=b.
         /// </summary>
         Original,
         /// <summary>

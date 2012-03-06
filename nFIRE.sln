@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nFire.Test", "nFire.Test\nF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nFire.Trec", "nFire.Trec\nFire.Trec.csproj", "{EBB11E21-F7BE-45DB-9EEE-176D4C832946}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nFire.Eirex", "nFire.Eirex\nFire.Eirex.csproj", "{2CA867CF-7F1A-4C0C-9D99-20D39264ECB2}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = nFIRE.vsmdi
@@ -35,6 +37,10 @@ Global
 		{EBB11E21-F7BE-45DB-9EEE-176D4C832946}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBB11E21-F7BE-45DB-9EEE-176D4C832946}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBB11E21-F7BE-45DB-9EEE-176D4C832946}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CA867CF-7F1A-4C0C-9D99-20D39264ECB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CA867CF-7F1A-4C0C-9D99-20D39264ECB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CA867CF-7F1A-4C0C-9D99-20D39264ECB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CA867CF-7F1A-4C0C-9D99-20D39264ECB2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
