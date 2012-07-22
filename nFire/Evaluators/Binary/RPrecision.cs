@@ -20,10 +20,11 @@ using nFire.Core;
 namespace nFire.Evaluators.Binary
 {
     /// <summary>
-    /// An evaluator for R-precision..
+    /// An evaluator for R-Precision (RP).
     /// It is assumed that the results in the run are ordered by rank.
     /// </summary>
-    public class RPrecision : IEvaluator<double, IListResult>
+    public class RPrecision :
+        IEvaluator<double, IListResult>
     {
         /// <summary>
         /// Gets the abbreviated name of the evaluator: "RP".
@@ -41,7 +42,7 @@ namespace nFire.Evaluators.Binary
         }
 
         /// <summary>
-        /// Gets and sets the minimum score a judgment must have to be considered relevant.
+        /// Gets and sets the minimum relevance score a document must have to be considered relevant.
         /// </summary>
         public double MinScore
         {
@@ -50,9 +51,9 @@ namespace nFire.Evaluators.Binary
         }
 
         /// <summary>
-        /// Creates an evaluator for R-precision.
+        /// Creates an evaluator for RP.
         /// </summary>
-        /// <param name="minScore">The minimum score a judgment must have to be considered relevant.</param>
+        /// <param name="minScore">The minimum relevance score a document must have to be considered relevant.</param>
         public RPrecision(double minScore = 1)
         {
             this.MinScore = minScore;
@@ -67,9 +68,10 @@ namespace nFire.Evaluators.Binary
         /// <returns>The RP score.</returns>
         public double Evaluate(IRun<IListResult> groundTruth, IRun<IListResult> systemRun)
         {
-            HashSet<string> relevant = new HashSet<string>(groundTruth.Where(r => r.Score >= MinScore).Select(r => r.Document.Id));
+            HashSet<string> relevant = new HashSet<string>(groundTruth.Where(r => r.Score >= this.MinScore).Select(r => r.Document.Id));
             HashSet<string> retrieved = new HashSet<string>(systemRun.Take(relevant.Count).Select(r => r.Document.Id));
-            return ((double)relevant.Intersect(retrieved).Count()) / relevant.Count;
+            if (relevant.Count == 0) return 0;
+            else return ((double)relevant.Intersect(retrieved).Count()) / relevant.Count;
         }
     }
 }

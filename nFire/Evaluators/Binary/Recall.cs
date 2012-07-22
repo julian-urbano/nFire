@@ -20,11 +20,11 @@ using nFire.Core;
 namespace nFire.Evaluators.Binary
 {
     /// <summary>
-    /// An evaluator for recall and recall after k documents retrieved (recall@k).
-    /// For recall@k it is assumed that the results in the run are ordered by rank.
+    /// An evaluator for Recall (R) and Recall after k documents retrieved (R@k).
+    /// For R@k it is assumed that the results in the run are ordered by rank.
     /// </summary>
     public class Recall :
-        IEvaluator<double,ISetResult>,
+        IEvaluator<double, ISetResult>,
         IEvaluator<double, IListResult>
     {
         /// <summary>
@@ -32,7 +32,8 @@ namespace nFire.Evaluators.Binary
         /// </summary>
         public string ShortName
         {
-            get {
+            get
+            {
                 if (this.Cutoff == null) return "R";
                 else return "R@" + this.Cutoff;
             }
@@ -42,14 +43,15 @@ namespace nFire.Evaluators.Binary
         /// </summary>
         public string FullName
         {
-            get {
+            get
+            {
                 if (this.Cutoff == null) return "Recall";
                 else return "Recall at " + this.Cutoff;
             }
         }
 
         /// <summary>
-        /// Gets and sets the minimum score a judgment must have to be considered relevant.
+        /// Gets and sets the minimum relevance score a document must have to be considered relevant.
         /// </summary>
         public double MinScore
         {
@@ -57,7 +59,7 @@ namespace nFire.Evaluators.Binary
             set;
         }
         /// <summary>
-        /// Gets and sets the cut-off k for recall@k. If null, recall is computed, with not cut-off.
+        /// Gets and sets the cut-off k for R@k. If null, R is computed, with not cut-off.
         /// </summary>
         public int? Cutoff
         {
@@ -66,10 +68,10 @@ namespace nFire.Evaluators.Binary
         }
 
         /// <summary>
-        /// Creates an evaluator for recall and recall@k.
+        /// Creates an evaluator for R and R@k.
         /// </summary>
-        /// <param name="minScore">The minimum score a judgment must have to be considered relevant.</param>
-        /// <param name="cutoff">The cut-off k for recall@k.</param>
+        /// <param name="minScore">The minimum relevance score a document must have to be considered relevant.</param>
+        /// <param name="cutoff">The cut-off k for R@k.</param>
         public Recall(double minScore = 1.0, int? cutoff = null)
         {
             this.MinScore = minScore;
@@ -112,8 +114,8 @@ namespace nFire.Evaluators.Binary
         {
             HashSet<string> relevant = new HashSet<string>(groundTruth.Where(r => r.Score >= minScore).Select(r => r.Document.Id));
             HashSet<string> retrieved = new HashSet<string>(systemRun.Take(cutOff).Select(r => r.Document.Id));
-            if (relevant.Count() == 0) return 0;
-            else return ((double)relevant.Intersect(retrieved).Count()) / relevant.Count();
+            if (relevant.Count == 0) return 0;
+            else return ((double)relevant.Intersect(retrieved).Count()) / relevant.Count;
         }
     }
 }

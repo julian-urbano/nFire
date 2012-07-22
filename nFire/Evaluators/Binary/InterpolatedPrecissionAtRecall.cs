@@ -21,7 +21,7 @@ using System;
 namespace nFire.Evaluators.Binary
 {
     /// <summary>
-    /// An evaluator for interpolated precision at recall levels.
+    /// An evaluator for Interpolated Precision at Recall levels (iPR@r).
     /// It is assumed that the results in the run are ordered by rank.
     /// </summary>
     /// <remarks>Based on the implementation by Chris Buckley in trec_eval 9.1.</remarks>
@@ -45,12 +45,12 @@ namespace nFire.Evaluators.Binary
         {
             get
             {
-                return "Interpolated Precission at "+this.RecallPoint+" Recall";
+                return "Interpolated Precission at " + this.RecallPoint + " Recall";
             }
         }
 
         /// <summary>
-        /// Gets and sets the minimum score a judgment must have to be considered relevant.
+        /// Gets and sets the minimum relevance score a document must have to be considered relevant.
         /// </summary>
         public double MinScore
         {
@@ -67,9 +67,9 @@ namespace nFire.Evaluators.Binary
         }
 
         /// <summary>
-        /// Creates an evaluator for interpolated precision at recall levels.
+        /// Creates an evaluator for iPR@r.
         /// </summary>
-        /// <param name="minScore">The minimum score a judgment must have to be considered relevant.</param>
+        /// <param name="minScore">The minimum relevance score a document must have to be considered relevant.</param>
         /// <param name="recallPoint">The recall point to calculate interpolated precision.</param>
         public InterpolatedPrecissionAtRecall(double minScore = 1.0, double recallPoint = 1.0)
         {

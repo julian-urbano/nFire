@@ -20,8 +20,8 @@ using nFire.Core;
 namespace nFire.Evaluators.Binary
 {
     /// <summary>
-    /// An evaluator for precision and precision after k documents retrieved (precision@k).
-    /// For precision@k it is assumed that the results in the run are ordered by rank.
+    /// An evaluator for Precision (P) and Precision after k documents retrieved (P@k).
+    /// For P@k it is assumed that the results in the run are ordered by rank.
     /// </summary>
     public class Precision :
         IEvaluator<double, ISetResult>,
@@ -51,7 +51,7 @@ namespace nFire.Evaluators.Binary
         }
 
         /// <summary>
-        /// Gets and sets the minimum score a judgment must have to be considered relevant.
+        /// Gets and sets the minimum relevance score a document must have to be considered relevant.
         /// </summary>
         public double MinScore
         {
@@ -59,7 +59,7 @@ namespace nFire.Evaluators.Binary
             set;
         }
         /// <summary>
-        /// Gets and sets the cut-off k for precision@k. If null, precision is computed, with not cut-off.
+        /// Gets and sets the cut-off k for P@k. If null, P is computed, with not cut-off.
         /// </summary>
         public int? Cutoff
         {
@@ -68,10 +68,10 @@ namespace nFire.Evaluators.Binary
         }
 
         /// <summary>
-        /// Creates an evaluator for precision and precision@k.
+        /// Creates an evaluator for P and P@k.
         /// </summary>
-        /// <param name="minScore">The minimum score a judgment must have to be considered relevant.</param>
-        /// <param name="cutoff">The cut-off k for precision@k.</param>
+        /// <param name="minScore">The minimum relevance score a document must have to be considered relevant.</param>
+        /// <param name="cutoff">The cut-off k for P@k.</param>
         public Precision(double minScore = 1.0, int? cutoff = null)
         {
             this.MinScore = minScore;
@@ -115,7 +115,7 @@ namespace nFire.Evaluators.Binary
             HashSet<string> relevant = new HashSet<string>(groundTruth.Where(r => r.Score >= minScore).Select(r => r.Document.Id));
             HashSet<string> retrieved = new HashSet<string>(systemRun.Take(cutOff).Select(r => r.Document.Id));
             if (cutOff == 0) return 0;
-            return ((double)relevant.Intersect(retrieved).Count()) / cutOff;
+            else return ((double)relevant.Intersect(retrieved).Count()) / cutOff;
         }
     }
 }

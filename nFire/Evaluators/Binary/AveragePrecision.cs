@@ -21,8 +21,8 @@ using nFire.Core;
 namespace nFire.Evaluators.Binary
 {
     /// <summary>
-    /// An evaluator for average precision and average precision after k documents retrieved (average-precision@k).
-    /// For average-precision@k it is assumed that the results in the run are ordered by rank.
+    /// An evaluator for Average Precision (AP) and Average Precision after k documents retrieved (AP@k).
+    /// For AP@k it is assumed that the results in the run are ordered by rank.
     /// </summary>
     public class AveragePrecision :
         IEvaluator<double, IListResult>
@@ -51,7 +51,7 @@ namespace nFire.Evaluators.Binary
         }
 
         /// <summary>
-        /// Gets and sets the minimum score a judgment must have to be considered relevant.
+        /// Gets and sets the minimum relevance score a document must have to be considered relevant.
         /// </summary>
         public double MinScore
         {
@@ -59,7 +59,7 @@ namespace nFire.Evaluators.Binary
             set;
         }
         /// <summary>
-        /// Gets and sets the cut-off k for average-precision@k. If null, average precision is computed, with not cut-off.
+        /// Gets and sets the cut-off k for AP@k. If null, AP is computed, with not cut-off.
         /// </summary>
         public int? Cutoff
         {
@@ -68,10 +68,10 @@ namespace nFire.Evaluators.Binary
         }
 
         /// <summary>
-        /// Creates an evaluator for average precision and average-precision@k.
+        /// Creates an evaluator for AP and AP@k.
         /// </summary>
-        /// <param name="minScore">The minimum score a judgment must have to be considered relevant.</param>
-        /// <param name="cutoff">The cut-off k for average-precision@k.</param>
+        /// <param name="minScore">The minimum relevance score a document must have to be considered relevant.</param>
+        /// <param name="cutoff">The cut-off k for AP@k.</param>
         public AveragePrecision(double minScore = 1.0, int? cutoff = null)
         {
             this.MinScore = minScore;
@@ -87,11 +87,12 @@ namespace nFire.Evaluators.Binary
         /// <returns>The AP@k score.</returns>
         public double Evaluate(IRun<IListResult> groundTruth, IRun<IListResult> systemRun)
         {
-            double ap = 0;
-            double relevantCount = 0;
             int cutoff = this.Cutoff == null ? systemRun.Count : (int)this.Cutoff;
 
             HashSet<string> relevant = new HashSet<string>(groundTruth.Where(j => j.Score >= this.MinScore).Select(j => j.Document.Id));
+
+            double ap = 0;
+            double relevantCount = 0;
             for (int i = 0; i < cutoff && i < systemRun.Count; i++) {
                 if (relevant.Contains(systemRun.ElementAt(i).Document.Id)) {
                     relevantCount++;
@@ -99,8 +100,7 @@ namespace nFire.Evaluators.Binary
                 }
             }
 
-            if (relevantCount == 0) return 0;
-            else return ap / relevant.Count;
+            return ap / relevant.Count; // In NTCIREVAL it is divided by min(R, cutoff) to ensure the upper bound is 1. We follow TREC's implementation instead.
         }
     }
 }

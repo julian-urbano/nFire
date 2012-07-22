@@ -22,19 +22,20 @@ using nFire.Core;
 namespace nFire.Evaluators.Binary
 {
     /// <summary>
-    /// An evaluator for F-measure and F-measure after k documents retrieved (F-measure@k).
-    /// For F-measure@k it is assumed that the results in the run are ordered by rank.
+    /// An evaluator for F-measure (F) and F-measure after k documents retrieved (F@k).
+    /// For F@k it is assumed that the results in the run are ordered by rank.
     /// </summary>
-	public class FMeasure :
+    public class FMeasure :
         IEvaluator<double, ISetResult>,
-        IEvaluator<double,IListResult>
+        IEvaluator<double, IListResult>
     {
         /// <summary>
         /// Gets the abbreviated name of the evaluator: "F" or "F@k".
         /// </summary>
         public string ShortName
         {
-            get {
+            get
+            {
                 if (this.Cutoff == null) return "F";
                 else return "F@" + this.Cutoff;
             }
@@ -44,14 +45,15 @@ namespace nFire.Evaluators.Binary
         /// </summary>
         public string FullName
         {
-            get {
+            get
+            {
                 if (this.Cutoff == null) return "F-measure";
                 else return "F-measure at " + this.Cutoff;
             }
         }
 
         /// <summary>
-        /// Gets and sets the minimum score a judgment must have to be considered relevant.
+        /// Gets and sets the minimum relevance score a document must have to be considered relevant.
         /// </summary>
         public double MinScore
         {
@@ -59,7 +61,7 @@ namespace nFire.Evaluators.Binary
             set;
         }
         /// <summary>
-        /// Gets and sets the cut-off k for precision@k. If null, F-measure is computed, with not cut-off.
+        /// Gets and sets the cut-off k for F@k. If null, F is computed, with not cut-off.
         /// </summary>
         public int? Cutoff
         {
@@ -68,7 +70,7 @@ namespace nFire.Evaluators.Binary
         }
 
         /// <summary>
-        /// Gets and sets the beta coefficient: the importance of recall with respect to precision.
+        /// Gets and sets the beta coefficient: the importance of Recall with respect to Precision.
         /// </summary>
         public double Beta
         {
@@ -77,35 +79,16 @@ namespace nFire.Evaluators.Binary
         }
 
         /// <summary>
-        /// Gets and sets the auxiliary pecision evaluator to compute the f score.
+        /// Creates an evaluator for F and F@k.
         /// </summary>
-        protected Precision P
-        {
-            get;
-            set;
-        }
-        /// <summary>
-        /// Gets and sets the auxiliary recall evaluator to compute the f score.
-        /// </summary>
-        protected Recall R
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Creates an evaluator for F-measure and F-measure@k.
-        /// </summary>
-        /// <param name="minScore">The minimum score a judgment must have to be considered relevant.</param>
-        /// <param name="cutoff">The cut-off k for F-measure@k.</param>
+        /// <param name="minScore">The minimum relevance score a document must have to be considered relevant.</param>
+        /// <param name="cutoff">The cut-off k for F@k.</param>
         /// <param name="beta">The beta coefficient.</param>
-        public FMeasure(double minScore = 1.0, int? cutoff =null, double beta=1.0)
+        public FMeasure(double minScore = 1.0, int? cutoff = null, double beta = 1.0)
         {
             this.MinScore = minScore;
             this.Cutoff = cutoff;
             this.Beta = beta;
-            this.P = new Precision();
-            this.R = new Recall();
         }
 
         /// <summary>
@@ -116,15 +99,7 @@ namespace nFire.Evaluators.Binary
         /// <returns>The F score.</returns>
         public double Evaluate(IRun<ISetResult> groundTruth, IRun<ISetResult> systemRun)
         {
-            this.P.MinScore = this.MinScore;
-            this.P.Cutoff = null;
-            this.R.MinScore = this.MinScore;
-            this.R.Cutoff = null;
-
-            double p = this.P.Evaluate(groundTruth, systemRun);
-            double r = this.R.Evaluate(groundTruth, systemRun);
-            if (this.Beta * this.Beta * p + r == 0) return 0;
-            else return (1.0 + this.Beta * this.Beta) * p * r / (this.Beta * this.Beta * p + r);
+            return this.Evaluate(groundTruth, systemRun, this.MinScore, systemRun.Count);
         }
         /// <summary>
         /// Computes the F@k score of the specified run according to the specified ground truth.
@@ -135,15 +110,31 @@ namespace nFire.Evaluators.Binary
         /// <returns>The F@k score.</returns>
         public double Evaluate(IRun<IListResult> groundTruth, IRun<IListResult> systemRun)
         {
-            this.P.MinScore = this.MinScore;
-            this.P.Cutoff = this.Cutoff;
-            this.R.MinScore = this.MinScore;
-            this.R.Cutoff = this.Cutoff;
+            int cut = this.Cutoff == null ? systemRun.Count : (int)this.Cutoff;
+            return this.Evaluate(groundTruth, systemRun, this.MinScore, cut);
+        }
 
-            double p = this.P.Evaluate(groundTruth, systemRun);
-            double r = this.R.Evaluate(groundTruth, systemRun);
-            if (this.Beta * this.Beta * p + r == 0) return 0;
-            else return (1.0 + this.Beta * this.Beta) * p * r / (this.Beta * this.Beta * p + r);
+        /// <summary>
+        /// Computes the F@k score of the specified run according to the specified ground truth, with the specified minimum relevance score and for the specified cut-off.
+        /// It is assumed that the results in the run are ordered by rank.
+        /// </summary>
+        /// <param name="groundTruth">The ground truth.</param>
+        /// <param name="systemRun">The system run.</param>
+        /// <param name="minScore">The minimum relevance score.</param>
+        /// <param name="cutOff">The cut-off.</param>
+        /// <returns>The F@k score.</returns>
+        protected double Evaluate(IRun<ISetResult> groundTruth, IRun<ISetResult> systemRun, double minScore, int cutOff)
+        {
+            HashSet<string> relevant = new HashSet<string>(groundTruth.Where(r => r.Score >= minScore).Select(r => r.Document.Id));
+            HashSet<string> retrieved = new HashSet<string>(systemRun.Take(cutOff).Select(r => r.Document.Id));
+
+            if (cutOff == 0 || relevant.Count == 0) return 0;
+
+            double prec = ((double)relevant.Intersect(retrieved).Count()) / cutOff;
+            double rec = ((double)relevant.Intersect(retrieved).Count()) / relevant.Count;
+
+            if (this.Beta * this.Beta * prec + rec == 0) return 0;
+            else return (1.0 + this.Beta * this.Beta) * prec * rec / (this.Beta * this.Beta * prec + rec);
         }
     }
 }

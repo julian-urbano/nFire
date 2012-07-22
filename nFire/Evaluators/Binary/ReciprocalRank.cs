@@ -20,10 +20,11 @@ using nFire.Core;
 namespace nFire.Evaluators.Binary
 {
     /// <summary>
-    /// An evaluator for reciprocal rank.
+    /// An evaluator for Reciprocal Rank (RR).
     /// It is assumed that the results in the run are ordered by rank.
     /// </summary>
-    public class ReciprocalRank : IEvaluator<double,IListResult>
+    public class ReciprocalRank :
+        IEvaluator<double, IListResult>
     {
         /// <summary>
         /// Gets the abbreviated name of the evaluator: "RR".
@@ -41,7 +42,7 @@ namespace nFire.Evaluators.Binary
         }
 
         /// <summary>
-        /// Gets and sets the minimum score a judgment must have to be considered relevant.
+        /// Gets and sets the minimum relevance score a document must have to be considered relevant.
         /// </summary>
         public double MinScore
         {
@@ -50,9 +51,9 @@ namespace nFire.Evaluators.Binary
         }
 
         /// <summary>
-        /// Creates an evaluator for reciprocal rank.
+        /// Creates an evaluator for RR.
         /// </summary>
-        /// <param name="minScore">The minimum score a judgment must have to be considered relevant.</param>
+        /// <param name="minScore">The minimum relevance score a document must have to be considered relevant.</param>
         public ReciprocalRank(double minScore = 1)
         {
             this.MinScore = minScore;
