@@ -22,7 +22,7 @@ namespace nFire.Evaluators.Binary
 {
     /// <summary>
     /// An evaluator for Average Precision (AP) and Average Precision after k documents retrieved (AP@k).
-    /// For AP@k it is assumed that the results in the run are ordered by rank.
+    /// It is assumed that the results in the run are ordered by rank.
     /// </summary>
     public class AveragePrecision :
         IEvaluator<double, IListResult>

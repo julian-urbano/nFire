@@ -13,34 +13,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 using nFire.Core;
-using nFire.Evaluators.Graded;
 
 namespace nFire.Evaluators.Graded
 {
     /// <summary>
-    /// Specifies a function to discount the document gains for the calculation of DCG scores.
-    /// </summary>
-    public enum DcgDiscountFunction
-    {
-        /// <summary>
-        /// The original function as in Järveling &amp;Kekäläinen, ACM TOIS, 2002: 1 if i&lt;b or 1/log_b(i) if i&lt;=b.
-        /// </summary>
-        Original,
-        /// <summary>
-        /// The function introduced by Microsoft: 1/log_b(i+1)
-        /// </summary>
-        Microsoft
-    }
-
-    /// <summary>
-    /// An evaluator for discounted cumulated gain and discounted cumulated gain after k documents retrieved (discounted-cumulated-gain@k).
-    /// For discounted-cumulated-gain@k it is assumed that the results in the run are ordered by rank.
+    /// An evaluator for Discounted Cumulated Gain (DCG) and Discounted Cumulated Gain after k documents retrieved (DCG@k).
+    /// It is assumed that the results in the run are ordered by rank.
     /// </summary>
     public class DiscountedCumulatedGain :
         IEvaluator<double, IListResult>
@@ -48,7 +30,7 @@ namespace nFire.Evaluators.Graded
         /// <summary>
         /// Gets the abbreviated name of the evaluator: "DCG" or "DCG@k".
         /// </summary>
-        public string ShortName
+        public virtual string ShortName
         {
             get
             {
@@ -59,7 +41,7 @@ namespace nFire.Evaluators.Graded
         /// <summary>
         /// Gets the full name of the evaluator: "Discounted Cumulated Gain" or "Discounted Cumulated Gain at k".
         /// </summary>
-        public string FullName
+        public virtual string FullName
         {
             get
             {
@@ -69,15 +51,7 @@ namespace nFire.Evaluators.Graded
         }
 
         /// <summary>
-        /// Gets and sets the minimum gain a judgment must have to contribute to the score.
-        /// </summary>
-        public double MinScore
-        {
-            get;
-            set;
-        }
-        /// <summary>
-        /// Gets and sets the cut-off k for discounted-cumulated-gain@k. If null, discounted cumulated gain is computed, with not cut-off.
+        /// Gets and sets the cut-off k for DCG@k. If null, DCG is computed, with not cut-off.
         /// </summary>
         public int? Cutoff
         {
@@ -85,35 +59,41 @@ namespace nFire.Evaluators.Graded
             set;
         }
         /// <summary>
-        /// Gets and sets the base of the logarithm for the discount function.
+        /// Gets and sets the gain function to map relevance scores onto information gain values.
         /// </summary>
-        public double LogBase
+        public IGainFunction GainFunction
         {
             get;
             set;
         }
         /// <summary>
-        /// The function to use when discounting a document's gain.
+        /// Gets and sets the function to compute gain discount factors.
         /// </summary>
-        public DcgDiscountFunction DiscountFunction
+        public IDiscountFunction DiscountFunction
         {
             get;
             set;
         }
 
         /// <summary>
-        /// Creates an evaluator for discounted cumulated gain and discounted-cumulated-gain@k.
+        /// Creates an evaluator for DCG and DCG@k with the specified gain and discount functions.
         /// </summary>
-        /// <param name="discountFunction">The discount function to lower gains.</param>
-        /// <param name="minScore">The minimum gain a judgment must have to contribute to the score.</param>
-        /// <param name="logBase">The base of the logarithm for the discount function.</param>
-        /// <param name="cutoff">The cut-off k for discounted-cumulated-gain@k.</param>
-        public DiscountedCumulatedGain(DcgDiscountFunction discountFunction, double minScore = 1, double logBase = 2, int? cutoff = null)
+        /// <param name="gainFunction">The relevance-gain mapping function.</param>
+        /// <param name="discountFunction">The function to discount gains.</param>
+        /// <param name="cutoff">The cut-off k for DCG@k.</param>
+        public DiscountedCumulatedGain(IGainFunction gainFunction, IDiscountFunction discountFunction, int? cutoff = null)
         {
+            this.GainFunction = gainFunction;
             this.DiscountFunction = discountFunction;
-            this.MinScore = minScore;
-            this.LogBase = logBase;
             this.Cutoff = cutoff;
+        }
+        /// <summary>
+        /// Creates an evaluator for DCG and DCG@k with a Linear gain function and a Logarithmic (Microsoft) discount function with base 2.
+        /// </summary>
+        /// <param name="cutoff">The cut-off k for DCG@k.</param>
+        public DiscountedCumulatedGain(int? cutoff = null)
+            : this(new LinearGain(), new LogarithmicDiscount(2.0), cutoff)
+        {
         }
 
         /// <summary>
@@ -123,35 +103,92 @@ namespace nFire.Evaluators.Graded
         /// <param name="groundTruth">The ground truth.</param>
         /// <param name="systemRun">The system run.</param>
         /// <returns>The DCG@k score.</returns>
-        public double Evaluate(IRun<IListResult> groundTruth, IRun<IListResult> systemRun)
+        public virtual double Evaluate(IRun<IListResult> groundTruth, IRun<IListResult> systemRun)
         {
             int cut = this.Cutoff == null ? systemRun.Count : (int)this.Cutoff;
 
             Dictionary<string, double> gains = new Dictionary<string, double>();
             foreach (var doc in groundTruth)
-                gains.Add(doc.Document.Id, doc.Score);
+                gains.Add(doc.Document.Id, this.GainFunction.Gain(doc.Score));
 
             double dcg = 0;
-            for (int i = 0; i < Math.Min(systemRun.Count, cut); i++) {
+            for (int i = 0; i < systemRun.Count && i < cut; i++) {
                 double g;
-                if (gains.TryGetValue(systemRun.ElementAt(i).Document.Id, out g) && g >= this.MinScore) {
-                    switch (this.DiscountFunction) {
-                        case DcgDiscountFunction.Original:
-                            if (i + 1 < this.LogBase) dcg += g;
-                            else dcg += g / Math.Log(i + 1, this.LogBase);
-                            break;
-                        case DcgDiscountFunction.Microsoft:
-                            dcg += g / Math.Log(i + 2, this.LogBase);
-                            break;
-                        default:
-                            throw new ArgumentException("Invalid DCG Discount function: " + this.DiscountFunction.ToString());
-                    }
+                if (gains.TryGetValue(systemRun.ElementAt(i).Document.Id, out g)) {
+                    dcg += g / this.DiscountFunction.Discount(i + 1);
                 } else {
                     // Unjudged document
                 }
             }
 
             return dcg;
+        }
+    }
+
+    /// <summary>
+    /// An evaluator for Normalized Discounted Cumulated Gain (nDCG) and Normalized Discounted Cumulated Gain after k documents retrieved (nDCGk).
+    /// It is assumed that the results in the run are ordered by rank.
+    /// </summary>
+    public class NormalizedDiscountedCumulatedGain : DiscountedCumulatedGain
+    {
+        /// <summary>
+        /// Gets the abbreviated name of the evaluator: "nDCG" or "nDCG@k".
+        /// </summary>
+        public override string ShortName
+        {
+            get
+            {
+                if (this.Cutoff == null) return "nDCG";
+                else return "nDCG@" + this.Cutoff;
+            }
+        }
+        /// <summary>
+        /// Gets the full name of the evaluator: "Normalized Discounted Cumulated Gain" or "Normalized Discounted Cumulated Gain at k".
+        /// </summary>
+        public override string FullName
+        {
+            get
+            {
+                if (this.Cutoff == null) return "Normalized Discounted Cumulated Gain";
+                else return "Normalized Discounted Cumulated Gain at " + this.Cutoff;
+            }
+        }
+
+        /// <summary>
+        /// Creates an evaluator for nDCG and nDCG@k with the specified gain and discount functions.
+        /// </summary>
+        /// <param name="gainFunction">The relevance-gain mapping function.</param>
+        /// <param name="discountFunction">The function to discount gains.</param>
+        /// <param name="cutoff">The cut-off k for nDCG@k.</param>
+        public NormalizedDiscountedCumulatedGain(IGainFunction gainFunction, IDiscountFunction discountFunction, int? cutoff = null)
+            : base(gainFunction, discountFunction, cutoff)
+        {
+        }        
+        /// <summary>
+        /// Creates an evaluator for nDCG and nDCG@k with a Linear gain function and a Logarithmic (Microsoft) discount function with base 2.
+        /// </summary>
+        /// <param name="cutoff">The cut-off k for nDCG@k.</param>
+        public NormalizedDiscountedCumulatedGain(int? cutoff = null)
+            : base(cutoff)
+        {
+        }
+
+        /// <summary>
+        /// Computes the nDCG@k score of the specified run according to the specified ground truth.
+        /// It is assumed that the results in the run are ordered by rank.
+        /// </summary>
+        /// <param name="groundTruth">The ground truth.</param>
+        /// <param name="systemRun">The system run.</param>
+        /// <returns>The nDCG@k score.</returns>
+        public override double Evaluate(IRun<IListResult> groundTruth, IRun<IListResult> systemRun)
+        {
+            double dcg = base.Evaluate(groundTruth, systemRun);
+            nFire.Base.Run<IListResult> ideal = new Base.Run<IListResult>(groundTruth.Query, groundTruth.System);
+            foreach (IListResult res in groundTruth.OrderByDescending(r => base.GainFunction.Gain(r.Score)))
+                ideal.Add(res);
+            double idcg = base.Evaluate(groundTruth, ideal);
+
+            return dcg / idcg;
         }
     }
 }

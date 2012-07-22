@@ -80,12 +80,10 @@
     <Compile Include="Base\System.cs" />
     <Compile Include="Base\Task.cs" />
     <Compile Include="Core\IEvaluator.cs" />
-    <None Include="Evaluators\Graded\AverageDynamicRecall.cs" />
+    <Compile Include="Evaluators\Graded\AverageDynamicRecall.cs" />
     <Compile Include="Evaluators\Binary\AveragePrecision.cs" />
-    <Compile Include="Evaluators\Graded\AverageGain.cs" />
     <Compile Include="Core\IItemCollection.cs" />
     <Compile Include="Evaluators\Binary\FMeasure.cs" />
-    <Compile Include="Evaluators\Graded\NormalizedDiscountedCumulatedGain.cs" />
     <Compile Include="Evaluators\Binary\Precision.cs" />
     <Compile Include="Evaluators\Binary\InterpolatedPrecissionAtRecall.cs" />
     <Compile Include="Evaluators\Binary\Recall.cs" />
@@ -96,8 +94,13 @@
     <Compile Include="Core\ISystem.cs" />
     <Compile Include="Core\ITask.cs" />
     <Compile Include="Core\IQuery.cs" />
+    <Compile Include="Evaluators\Graded\IDiscountFunction.cs" />
+    <Compile Include="Evaluators\Graded\ExpectedReciprocalRank.cs" />
+    <Compile Include="Evaluators\Graded\IGainFunction.cs" />
+    <Compile Include="Evaluators\Graded\QMeasure.cs" />
     <Compile Include="Evaluators\Graded\CumulatedGain.cs" />
     <Compile Include="Evaluators\Graded\DiscountedCumulatedGain.cs" />
+    <Compile Include="Evaluators\Graded\RankBiasedPrecision.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\IRun.cs" />
   </ItemGroup>
