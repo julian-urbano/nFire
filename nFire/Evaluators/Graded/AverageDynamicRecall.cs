@@ -82,6 +82,8 @@ namespace nFire.Evaluators.Graded
             int cut = this.Cutoff == null ? systemRun.Count : Math.Min(systemRun.Count, (int)this.Cutoff);
 
             IListResult[] sortedRelevant = groundTruth.Where(r => r.Score > 0).OrderByDescending(r => r.Score).ToArray();
+            if (sortedRelevant.Length == 0)
+                return 0;
             cut = Math.Min(cut, sortedRelevant.Length); // If cut > |R|, sum up to |R| ranks
             string[] retrieved = systemRun.Take(cut).Select(r => r.Document.Id).ToArray();
 
