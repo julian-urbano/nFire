@@ -276,7 +276,7 @@ namespace nFire.Evaluators.Graded
         /// <returns>The nAG score.</returns>
         public override double Evaluate(IRun<ISetResult> groundTruth, IRun<ISetResult> systemRun)
         {
-            return base.Evaluate(groundTruth, systemRun, systemRun.Count) / systemRun.Count / this.MaxScore;
+            return base.Evaluate(groundTruth, systemRun, systemRun.Count) / systemRun.Count / this.GainFunction.Gain(this.MaxScore);
         }
         /// <summary>
         /// Computes the nAG@k score of the specified run according to the specified ground truth.
@@ -288,7 +288,7 @@ namespace nFire.Evaluators.Graded
         public override double Evaluate(IRun<IListResult> groundTruth, IRun<IListResult> systemRun)
         {
             int cut = this.Cutoff == null ? systemRun.Count : (int)this.Cutoff;
-            return base.Evaluate(groundTruth, systemRun, cut) / cut / this.MaxScore;
+            return base.Evaluate(groundTruth, systemRun, cut) / cut / this.GainFunction.Gain(this.MaxScore);
         }
     }
 }

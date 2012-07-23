@@ -130,9 +130,9 @@ namespace nFire.Test
 
                     var res = this.Task.EvaluateAllQueries<double>(this.Task.Systems["STANDARD"], nag);
                     var res2 = this.Task.EvaluateAllQueries<double>(this.Task.Systems["STANDARD"], cg);
-                    Assert.AreEqual(res2[this.Task.Queries["301"]] / 4.0 / cut, res[this.Task.Queries["301"]], 0.00005);
-                    Assert.AreEqual(res2[this.Task.Queries["302"]] / 4.0 / cut, res[this.Task.Queries["302"]], 0.00005);
-                    Assert.AreEqual(res2[this.Task.Queries["303"]] / 4.0 / cut, res[this.Task.Queries["303"]], 0.00005);
+                    Assert.AreEqual(res2[this.Task.Queries["301"]] / nag.GainFunction.Gain(4.0) / cut, res[this.Task.Queries["301"]], 0.00005);
+                    Assert.AreEqual(res2[this.Task.Queries["302"]] / nag.GainFunction.Gain(4.0) / cut, res[this.Task.Queries["302"]], 0.00005);
+                    Assert.AreEqual(res2[this.Task.Queries["303"]] / nag.GainFunction.Gain(4.0) / cut, res[this.Task.Queries["303"]], 0.00005);
                 }
             }
         }
