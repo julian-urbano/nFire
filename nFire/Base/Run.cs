@@ -64,6 +64,33 @@ namespace nFire.Base
             this.Query = query;
             this.System = system;
         }
+        /// <summary>
+        /// Creates a new base run for the specified system and the specified query ID.
+        /// </summary>
+        /// <param name="queryId">The query ID.</param>
+        /// <param name="system">The system.</param>
+        public Run(string queryId, ISystem system)
+            : this(new Query(queryId), system)
+        {
+        }
+        /// <summary>
+        /// Creates a new base run for the specified system ID and the specified query.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="systemId">The system ID.</param>
+        public Run(IQuery query, string systemId)
+            : this(query, new System(systemId))
+        {
+        }
+        /// <summary>
+        /// Creates a new base run for the specified system ID and the specified query ID.
+        /// </summary>
+        /// <param name="queryId">The query ID.</param>
+        /// <param name="systemId">The system ID.</param>
+        public Run(string queryId, string systemId)
+            : this(new Query(queryId), new System(systemId))
+        {
+        }
 
         /// <summary>
         /// Returns the number of results in the run.

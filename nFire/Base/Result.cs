@@ -33,6 +33,15 @@ namespace nFire.Base
             this.Document = document;
             this.Score = score;
         }
+        /// <summary>
+        /// Creates a new result for a document.
+        /// </summary>
+        /// <param name="documentId">The ID of the document retrieved.</param>
+        /// <param name="score">The score given to the document.</param>
+        public SetResult(string documentId, double score)
+            : this(new Document(documentId), score)
+        {
+        }
 
         /// <summary>
         /// Gets the document.
@@ -67,6 +76,16 @@ namespace nFire.Base
             :base(document,score)
         {
             this.Rank = rank;
+        }
+        /// <summary>
+        /// Creates a new result for a document.
+        /// </summary>
+        /// <param name="documentId">The ID of the document retrieved.</param>
+        /// <param name="score">The score given to the document.</param>
+        /// <param name="rank">The rank at which the document was retrieved.</param>
+        public ListResult(string documentId, double score, int rank)
+            : this(new Document(documentId), score, rank)
+        {
         }
 
         /// <summary>
