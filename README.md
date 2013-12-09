@@ -10,4 +10,4 @@ It is written entirely in C# under Visual Studio 2010 and .net framework 4.
 Dependencies
 ------------
 
-* nFire v0.2.1 uses de [http://www.icsharpcode.net/opensource/sharpziplib/](C# SharpZipLib) assembly.
+* nFire v0.2.1 uses the [C# SharpZipLib](http://www.icsharpcode.net/opensource/sharpziplib/) assembly.
